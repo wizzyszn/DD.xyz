@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertTriangle,
   ExternalLink,
@@ -19,33 +17,155 @@ import { FundFlowCard } from "@/components/fund-flow-card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+type SingleCategory = {
+  key: string;
+  name: string;
+  gradedDescription: Record<"high" | "medium" | "low", string>;
+  tags: {
+    sanctioned: boolean;
+    address_poisoning: boolean;
+  };
+};
+type Category = Record<"fraudulent_malicious", SingleCategory>;
+interface Issue {
+  score: number;
+  tags: Array<{
+    name: string;
+    description: string;
+    type: "addressRisk";
+    severity: number;
+    key:
+      | "associated_mixer"
+      | "sanctioned"
+      | "associated_sanctioned"
+      | "associated_drainer"
+      | "address_poisoning";
+  }>;
+  categories: Category;
+  riskScore: string;
+}
+type RiskTypes = Record<
+  "ofac" | "hacker" | "mixers" | "drainer" | "fbi_ic3" | "tornado",
+  boolean
+>;
+type Account = {
+  [address: string]: {
+    type: "eoa" | "contract";
+    label: string;
+    address: string;
+    risk_score: number;
+    additional_labels: RiskTypes;
+  };
+};
+interface AddressInfo {
+  balance: number;
+  expiresAt: number;
+  time_1st_tx: string;
+  time_verified: number;
+  has_no_balance: boolean;
+  automated_trading: boolean;
+  transaction_count: number;
+  has_no_transactions: boolean;
+}
+interface ThreatData {
+  count: number;
+  medium: number;
+  high: number;
+  overallRisk: number;
+  issues: Issue[];
+  details: {
+    fund_flows: {
+      risk: RiskTypes;
+      flows: any[];
+      label: string;
+      accounts: Account;
+      fund_flow_risk: RiskTypes;
+    };
+    address_info: AddressInfo;
+  };
+}
+interface ResponseError extends Error {
+  message: string;
+  error: string;
+  statusCode: number;
+}
+const Chains = [
+  { label: "ETH", value: "eth" },
+  { label: "Base", value: "base" },
+  {
+    label: "BSC",
+    value: "bsc",
+  },
+  { label: "Polygon", value: "pol" },
+  { label: "Opt", value: "opt" },
+  { label: "Arbitrum", value: "arb" },
+  { label: "Solana", value: "sol" },
+  { label: "Ton", value: "ton" },
+  { label: "Sei", value: "sei" },
+];
 export default function ThreatRisks() {
   const [loading, setLoading] = useState(false);
-  const [threatData, setThreatData] = useState<any>(null);
+  const [threatData, setThreatData] = useState<ThreatData | null>(null);
+  const [address, setAddress] = useState("");
+  const [chainType, setChainType] = useState("");
+  const [error, setError] = useState<ResponseError | null>(null);
+  const [activityCount, setActivityCount] = useState(0);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = async (value: string, chain?: string) => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setThreatData({
-        score: 8.5,
-        riskLevel: "high",
-        tags: [
-          { name: "Malicious Activity", severity: 9, type: "Security" },
-          { name: "Suspicious Transfers", severity: 7, type: "Transaction" },
-          { name: "Compromised Account", severity: 8, type: "Account" },
-        ],
-        addressInfo: {
-          address: "0x1234...5678",
-          balance: 2.5,
-          transactionCount: 156,
-          firstTxTime: "2024-01-15T10:30:00Z",
-          automated: true,
-        },
+    setAddress(value);
+    setChainType(chain as string);
+    setError(null);
+    try {
+      const response = await fetch(
+        `https://api.webacy.com/addresses/${value}/?chain=${chain}`,
+        {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            "x-api-key": "xmKKmaD3Th5tP3PUPUZsB8MaiZ3RvhVe4EpTaTzJ",
+          },
+        }
+      );
+      if (!response.ok) {
+        let errorMsg = "An error occured. Please try again";
+        try {
+          const errorData = (await response.json()) || errorMsg;
+          errorMsg = errorData.message || errorMsg;
+          setError({
+            name: "APIError",
+            message: errorMsg,
+            error: errorMsg,
+            statusCode: response.status,
+          });
+          setThreatData(null);
+          return;
+        } catch {}
+      }
+      const data = (await response.json()) as ThreatData;
+      setThreatData(data);
+    } catch (err: any) {
+      console.error(err);
+      setError({
+        name: err.name || "NetworkError",
+        message: err.message || "Network error occurred",
+        error: err.message || "",
+        statusCode: 0,
       });
+      setThreatData(null);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
+  console.log(threatData);
+  useEffect(() => {
+    if (!threatData) return;
+    threatData?.issues.forEach((issue) => {
+      let count = 0;
+      count += issue.tags.length;
+      setActivityCount(count);
+    });
+  }, [threatData?.issues]);
 
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6">
@@ -62,7 +182,12 @@ export default function ThreatRisks() {
         <SearchBar
           onSearch={handleSearch}
           placeholder="Enter address to analyze threats..."
+          types={Chains}
+          loading={loading}
         />
+        {error && (
+          <div className="text-red-500 mt-2 text-xs ">{error.message}</div>
+        )}
       </div>
 
       {loading ? (
@@ -82,8 +207,8 @@ export default function ThreatRisks() {
               glowing
             >
               <div className="flex flex-col items-center gap-4">
-                <RiskScore score={threatData.score} size="lg" />
-                <div className="flex flex-wrap gap-2 justify-center">
+                <RiskScore score={threatData.overallRisk || 0} size="lg" />
+                {/*      <div className="flex flex-wrap gap-2 justify-center">
                   {threatData.tags.map((tag: any, i: number) => (
                     <RiskTag
                       key={i}
@@ -92,35 +217,36 @@ export default function ThreatRisks() {
                       type={tag.type}
                     />
                   ))}
-                </div>
+                </div>*/}
               </div>
             </DataCard>
 
             <AddressInfoCard
-              data={threatData.addressInfo}
+              data={threatData.details.address_info}
               className="md:col-span-2 lg:col-span-1"
+              address={address}
+              chain={chainType}
             />
 
             <DataCard
               title="Activity Analysis"
               icon={<Activity className="text-purple-500" />}
               className="md:col-span-2 lg:col-span-1"
+              glowing
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">High Risk Actions</span>
-                  <span className="text-sm font-bold text-red-500">12</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    Suspicious Patterns
+                  <span className="text-sm font-medium">Issues</span>
+                  <span className="text-sm font-bold text-red-500">
+                    {threatData.issues.length}
                   </span>
-                  <span className="text-sm font-bold text-yellow-500">8</span>
                 </div>
                 <div className="h-[1px] bg-border" />
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Total Activities</span>
-                  <span className="text-sm font-bold">45</span>
+                  <span className="text-sm font-medium">
+                    Total Activities / Interactions
+                  </span>
+                  <span className="text-sm font-bold">{activityCount}</span>
                 </div>
               </div>
             </DataCard>

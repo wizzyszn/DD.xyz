@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Cpu } from "lucide-react";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -11,21 +9,23 @@ import {
   SelectValue,
 } from "./ui/select";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface SearchBarProps {
-  onSearch: (value: string) => void;
+  onSearch: (value: string, chain?: string) => void;
   placeholder?: string;
   types?: { value: string; label: string }[];
+  loading ?: boolean 
 }
 
-export function SearchBar({ onSearch, placeholder, types }: SearchBarProps) {
+export function SearchBar({ onSearch, placeholder, types ,loading}: SearchBarProps) {
   const [value, setValue] = useState("");
   const [type, setType] = useState(types?.[0]?.value || "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (value.trim()) {
-      onSearch(value.trim());
+      onSearch(value.trim(), type);
     }
   };
 
@@ -38,7 +38,7 @@ export function SearchBar({ onSearch, placeholder, types }: SearchBarProps) {
       )}
     >
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors duration-200 group-focus-within:text-foreground" />
+        <Cpu className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors duration-200 group-focus-within:text-foreground" />
         <Input
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -77,6 +77,9 @@ export function SearchBar({ onSearch, placeholder, types }: SearchBarProps) {
           </SelectContent>
         </Select>
       )}
+      <Button className="text-white" type="submit" disabled={loading || value === ''}>
+        {loading ? "...." : "Analyze"}
+      </Button>
     </form>
   );
 }

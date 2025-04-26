@@ -77,3 +77,11 @@ export function getTimeAgo(date: string | Date) {
   }
   return "Just now";
 }
+export function formatAddress(address: string): string {
+  if (address.length < 10) return address; // if address is weird/too short
+
+  const start = address.slice(0, 3);   // "0x8"
+  const end = address.slice(-4);       // "DA16"
+
+  return `${start}......${end}`;
+}
