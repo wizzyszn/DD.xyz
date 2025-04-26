@@ -1,0 +1,200 @@
+{
+  "count": 172,
+  "medium": 3,
+  "high": 73,
+  "overallRisk": 53.08655025693248,
+  "issues": [
+    {
+      "transaction": {
+        "transaction_hash": "0xb276dbe945ad98fe65862b77d2683e010e8cd095c6260abff10533942f20a673",
+        "from_to_address": "0x20f8320addd70439b67df27389bbebd7a998e5bb",
+        "direction": "incoming",
+        "contract_address": "0x5f6d3fc8147ed50ffc13bccfeb342659bcb83853",
+        "token_id": "",
+        "token_type": "ERC20",
+        "block_number": 20991251,
+        "timestamp": 1729240091,
+        "datetime": "2024-10-18T08:28:11.000Z",
+        "is_contract": false,
+        "address_info_risk": {
+          "balance": 0.000224354102868,
+          "expiresAt": 1734742928210,
+          "time_1st_tx": "2024-10-18T06:05:35.000Z",
+          "time_verified": 1734656528210,
+          "has_no_balance": false,
+          "automated_trading": false,
+          "transaction_count": 18,
+          "has_no_transactions": false
+        },
+        "token_risk": {
+          "expiresAt": 1748045219675,
+          "is_trusted": false,
+          "token_name": "Fidelity National Financial",
+          "token_symbol": "FNF",
+          "access_control": {
+            "interfaceType": "Ownable",
+            "activeRoleHolders": [
+              {
+                "name": "OWNER_ROLE",
+                "role": "owner",
+                "account": "0x0000000000000000000000000000000000000000"
+              }
+            ]
+          },
+          "illegal_unicode": false,
+          "contract_address": "0x5f6d3fc8147ed50ffc13bccfeb342659bcb83853"
+        },
+        "address_risk_data": {
+          "mixer": "0",
+          "reinit": "0",
+          "address": "0x20f8320addd70439b67df27389bbebd7a998e5bb",
+          "fake_kyc": "0",
+          "expiresAt": 1734742928729,
+          "gas_abuse": "0",
+          "cybercrime": "0",
+          "fake_token": "0",
+          "sanctioned": "0",
+          "data_source": "",
+          "blacklist_doubt": "0",
+          "financial_crime": "0",
+          "stealing_attack": "0",
+          "money_laundering": "0",
+          "phishing_activities": "0",
+          "blackmail_activities": "0",
+          "darkweb_transactions": "0",
+          "fake_standard_interface": "0",
+          "honeypot_related_address": "0",
+          "malicious_mining_activities": "0",
+          "number_of_malicious_contracts_created": "0",
+          "automated_trading": false
+        },
+        "token_risk_data": {
+          "buy_tax": "",
+          "holders": [
+            {
+              "tag": "",
+              "address": "0x4881047c4c2f09a7832d7990455478cfbc915b27",
+              "balance": "16256348197.764594776572894571",
+              "percent": "0.948721809032074396",
+              "is_locked": 0,
+              "is_contract": 0
+            },
+            {
+              "tag": "",
+              "address": "0x000000000000000000000000000000000000dead",
+              "balance": "850000000",
+              "percent": "0.049606069448497227",
+              "is_locked": 1,
+              "is_contract": 0
+            },
+            {
+              "tag": "",
+              "address": "0x7712c34205737192402172409a8f7ccef8aa2aec",
+              "balance": "10030225",
+              "percent": "0.000585364750510650",
+              "is_locked": 0,
+              "is_contract": 1
+            },
+            {
+              "tag": "",
+              "address": "0xc3d688b66703497daa19211eedff47f25384cdc3",
+              "balance": "2053310",
+              "percent": "0.000119831339363875",
+              "is_locked": 0,
+              "is_contract": 1
+            },
+            {
+              "tag": "",
+              "address": "0x3b0bc51ab9de1e5b7b6e34e5b960285805c41736",
+              "balance": "1195526",
+              "percent": "0.000069770995039393",
+              "is_locked": 0,
+              "is_contract": 0
+            },
+            {
+              "tag": "",
+              "address": "0x4b16c5de96eb2117bbe5fd171e4d203624b014aa",
+              "balance": "346486",
+              "percent": "0.000020220951269331",
+              "is_locked": 0,
+              "is_contract": 0
+            },
+            {
+              "tag": "",
+              "address": "0xd6153f5af5679a75cc85d8974463545181f48772",
+              "balance": "311700",
+              "percent": "0.000018190837467172",
+              "is_locked": 0,
+              "is_contract": 0
+            }
+          ],
+          "is_proxy": "0",
+          "sell_tax": "",
+          "expiresAt": 1745539620091,
+          "is_in_dex": "0",
+          "cannot_buy": "0",
+          "token_name": "Fidelity National Financial",
+          "is_honeypot": "0",
+          "is_mintable": "0",
+          "hidden_owner": "1",
+          "holder_count": "104",
+          "selfdestruct": "0",
+          "token_symbol": "FNF",
+          "total_supply": "17135000000",
+          "external_call": "0",
+          "is_anti_whale": "0",
+          "owner_address": "0x0000000000000000000000000000000000000000",
+          "owner_balance": "0",
+          "owner_percent": "0.000000",
+          "is_blacklisted": "1",
+          "is_open_source": "1",
+          "is_whitelisted": "0",
+          "creator_address": "0x20f8320addd70439b67df27389bbebd7a998e5bb",
+          "creator_balance": "0.6131353381976502",
+          "creator_percent": "0.000000",
+          "trading_cooldown": "0",
+          "transfer_pausable": "1",
+          "slippage_modifiable": "0",
+          "owner_change_balance": "0",
+          "anti_whale_modifiable": "0",
+          "can_take_back_ownership": "0",
+          "honeypot_with_same_creator": "0",
+          "personal_slippage_modifiable": "0",
+          "trust_list": "0",
+          "access_control": true
+        },
+        "contract_risk_data": {},
+        "token_name": "Fidelity National Financial"
+      },
+      "score": 0,
+      "tags": [
+        {
+          "name": "Access Control",
+          "description": "The token has users with special privileges, such as the ability to mint new tokens, burn existing tokens, or change the contract's code. Refer to the code for more details.",
+          "type": "tokenRisk",
+          "severity": 0.5,
+          "key": "access_control"
+        }
+      ],
+      "categories": {
+        "governance_issues": {
+          "key": "governance_issues",
+          "name": "Contract Governance",
+          "description": "Suspect logic in the smart contract for this asset indicates elevated governance risk. This means that the owner or creator has the ability to change elements of the smart contract that may affect the nature of your ownership of the tokens. Token scams like rugpulls typically exhibit signs of governance issues.",
+          "tags": { "access_control": true, "is_blacklisted": true }
+        },
+        "fraudulent_malicious": {
+          "key": "fraudulent_malicious",
+          "name": "Fraudulent/Malicious",
+          "gradedDescription": {
+            "high": "The smart contract/address in this transaction has been used in and is associated with confirmed fraud and malicious activity, or the asset is a known malicious token. Interacting with it may also cause your address to be marked as fraudulent.",
+            "medium": "Elements of the smart contract in this transaction can be used a fraudulent and malicious fashion, or the address in this transaction has been involved in some risk activity.",
+            "low": "Properties of this transaction indicate the possibility of nefarious activity, but we have not detected anything that would constitute elevated risk"
+          },
+          "tags": { "hidden_owner": true, "is_blacklisted": true }
+        }
+      },
+      "riskScore": "Medium Risk"
+    }
+  ]
+}
