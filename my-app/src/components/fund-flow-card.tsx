@@ -1,163 +1,131 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { RiskBadge } from "@/components/risk-badge"
-import { AlertTriangle, AlertOctagon, Droplets, Shield } from "lucide-react"
+import {
+  Activity,
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  CircleDollarSign,
+  History,
+} from "lucide-react";
 
-interface FundFlowRisk {
-  ofac: boolean
-  hacker: boolean
-  mixers: boolean
-  drainer: boolean
-  fbi_ic3: boolean
-  tornado: boolean
-}
-
-interface FundFlowAccount {
-  type: string
-  label: string
-  address: string
-  risk_score: number
-  additional_labels: {
-    ofac: boolean
-    hacker: boolean
-    mixers: boolean
-    drainer: boolean
-    fbi_ic3: boolean
-    tornado: boolean
-  }
-}
-
-interface FundFlowProps {
-  fundFlows: {
-    risk: FundFlowRisk
-    label: string
-    accounts: Record<string, FundFlowAccount>
-    fund_flow_risk: FundFlowRisk
-  }
-}
-
-export function FundFlowCard({ fundFlows }: FundFlowProps) {
-  const accounts = Object.values(fundFlows.accounts || {})
-  const hasRiskyConnections =
-    fundFlows.fund_flow_risk.ofac ||
-    fundFlows.fund_flow_risk.hacker ||
-    fundFlows.fund_flow_risk.mixers ||
-    fundFlows.fund_flow_risk.drainer ||
-    fundFlows.fund_flow_risk.fbi_ic3 ||
-    fundFlows.fund_flow_risk.tornado
-
+export function FundFlowCard() {
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Fund Flow Analysis</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {hasRiskyConnections ? (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-red-500">Risky Connections Detected</h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  This address has connections to high-risk entities including
-                  {fundFlows.fund_flow_risk.ofac && " sanctioned addresses,"}
-                  {fundFlows.fund_flow_risk.tornado && " Tornado Cash,"}
-                  {fundFlows.fund_flow_risk.mixers && " coin mixers,"}
-                  {fundFlows.fund_flow_risk.drainer && " drainer addresses,"}
-                  {fundFlows.fund_flow_risk.hacker && " known hackers,"}
-                  {fundFlows.fund_flow_risk.fbi_ic3 && " FBI flagged addresses,"}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
-            <div className="flex items-start gap-2">
-              <Shield className="h-5 w-5 text-green-500 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-green-500">No Risky Connections</h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  This address has no detected connections to high-risk entities.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {accounts.length > 0 && (
-          <div>
-            <h3 className="text-sm font-medium mb-2">Connected Addresses</h3>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-              {accounts.map((account) => (
-                <div
-                  key={account.address}
-                  className="flex items-start justify-between p-2 rounded-md bg-card/50 border border-border/50"
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {account.type === "contract" ? (
-                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                          <AlertOctagon className="h-3 w-3 text-blue-500" />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                          <Droplets className="h-3 w-3 text-purple-500" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs font-medium">{account.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {account.address.slice(0, 6)}...{account.address.slice(-4)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-1 mt-1.5 ml-8">
-                      {account.additional_labels.ofac && (
-                        <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded-full text-[10px]">OFAC</span>
-                      )}
-                      {account.additional_labels.tornado && (
-                        <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded-full text-[10px]">
-                          Tornado
-                        </span>
-                      )}
-                      {account.additional_labels.mixers && (
-                        <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-500 rounded-full text-[10px]">
-                          Mixer
-                        </span>
-                      )}
-                      {account.additional_labels.drainer && (
-                        <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded-full text-[10px]">
-                          Drainer
-                        </span>
-                      )}
-                      {account.additional_labels.hacker && (
-                        <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded-full text-[10px]">
-                          Hacker
-                        </span>
-                      )}
-                      {account.additional_labels.fbi_ic3 && (
-                        <span className="px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded-full text-[10px]">FBI</span>
-                      )}
-                    </div>
+    <div className="space-y-6">
+      <div className="rounded-lg border p-4">
+        <h3 className="text-sm font-medium mb-4">Recent Fund Flows</h3>
+        <div className="space-y-4">
+          {[1, 2, 3].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-4 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
+            >
+              {i % 2 === 0 ? (
+                <div className="mt-0.5 rounded-full bg-red-500/10 p-1">
+                  <ArrowUp className="h-4 w-4 text-red-500" />
+                </div>
+              ) : (
+                <div className="mt-0.5 rounded-full bg-green-500/10 p-1">
+                  <ArrowDown className="h-4 w-4 text-green-500" />
+                </div>
+              )}
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">
+                    {i % 2 === 0 ? "Outgoing Transfer" : "Incoming Transfer"}
+                  </h4>
+                  <span className="text-sm font-medium">
+                    {i % 2 === 0 ? "-" : "+"}2.5 ETH
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">0x1234...5678</p>
+                  <time className="text-xs text-muted-foreground">
+                    2 hours ago
+                  </time>
+                </div>
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Activity className="h-3.5 w-3.5" />
+                    {i % 2 === 0 ? "High risk recipient" : "Trusted sender"}
                   </div>
-                  <div>
-                    {account.risk_score > 100 ? (
-                      <RiskBadge level="critical" />
-                    ) : account.risk_score > 50 ? (
-                      <RiskBadge level="high" />
-                    ) : account.risk_score > 20 ? (
-                      <RiskBadge level="medium" />
-                    ) : account.risk_score > 0 ? (
-                      <RiskBadge level="low" />
-                    ) : (
-                      <RiskBadge level="low" />
-                    )}
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <History className="h-3.5 w-3.5" />
+                    First interaction
                   </div>
                 </div>
-              ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-lg border p-4">
+          <h3 className="text-sm font-medium mb-4">Flow Summary</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-red-500/10 p-1">
+                  <ArrowUp className="h-4 w-4 text-red-500" />
+                </div>
+                <span className="text-sm">Outgoing</span>
+              </div>
+              <span className="text-sm font-medium text-red-500">
+                -15.8 ETH
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-green-500/10 p-1">
+                  <ArrowDown className="h-4 w-4 text-green-500" />
+                </div>
+                <span className="text-sm">Incoming</span>
+              </div>
+              <span className="text-sm font-medium text-green-500">
+                +12.3 ETH
+              </span>
+            </div>
+            <div className="h-[1px] bg-border" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-blue-500/10 p-1">
+                  <CircleDollarSign className="h-4 w-4 text-blue-500" />
+                </div>
+                <span className="text-sm">Net Flow</span>
+              </div>
+              <span className="text-sm font-medium text-blue-500">
+                -3.5 ETH
+              </span>
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
-  )
+        </div>
+
+        <div className="rounded-lg border p-4">
+          <h3 className="text-sm font-medium mb-4">Risk Distribution</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-red-500" />
+                <span className="text-sm">High Risk</span>
+              </div>
+              <span className="text-sm text-muted-foreground">45%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-500" />
+                <span className="text-sm">Medium Risk</span>
+              </div>
+              <span className="text-sm text-muted-foreground">35%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="text-sm">Low Risk</span>
+              </div>
+              <span className="text-sm text-muted-foreground">20%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -1,27 +1,42 @@
-import type { ReactNode } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface DataCardProps {
-  title: string
-  description?: string
-  icon?: ReactNode
-  children: ReactNode
-  className?: string
-  glowing?: boolean
+  title: string;
+  icon?: ReactNode;
+  children: ReactNode;
+  glowing?: boolean;
+  className?: string;
 }
 
-export function DataCard({ title, description, icon, children, className, glowing = false }: DataCardProps) {
+export function DataCard({
+  title,
+  icon,
+  children,
+  glowing,
+  className,
+}: DataCardProps) {
   return (
-    <Card className={cn("overflow-hidden border-border/50 bg-card/80 backdrop-blur-sm", glowing && "glow", className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div>
-          <CardTitle className="text-lg font-bold">{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
-        </div>
-        {icon && <div className="text-primary">{icon}</div>}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
-  )
+    <div
+      className={cn(
+        "relative rounded-xl border bg-card p-6 text-card-foreground shadow-sm",
+        "transition-all duration-300",
+        "hover:shadow-md hover:border-border/60",
+        "animate-in fade-in-0 zoom-in-95",
+        glowing &&
+          "after:absolute after:-inset-px after:rounded-xl after:shadow-[0_0_15px_rgba(24,182,150,0.4)] after:animate-pulse",
+        className
+      )}
+    >
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-sm font-medium">{title}</h3>
+        {icon && (
+          <div className="transition-transform duration-300 hover:scale-110">
+            {icon}
+          </div>
+        )}
+      </div>
+      <div className="mt-4">{children}</div>
+    </div>
+  );
 }

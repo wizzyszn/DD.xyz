@@ -1,68 +1,82 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, ArrowRight } from "lucide-react"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
-  placeholder?: string
-  onSearch?: (value: string, type: string) => void
-  types?: Array<{ value: string; label: string }>
+  onSearch: (value: string) => void;
+  placeholder?: string;
+  types?: { value: string; label: string }[];
 }
 
-export function SearchBar({
-  placeholder = "Search by address, token, contract...",
-  onSearch,
-  types = [
-    { value: "address", label: "Address" },
-    { value: "token", label: "Token" },
-    { value: "contract", label: "Contract" },
-    { value: "url", label: "URL" },
-  ],
-}: SearchBarProps) {
-  const [searchValue, setSearchValue] = useState("")
-  const [searchType, setSearchType] = useState(types[0].value)
+export function SearchBar({ onSearch, placeholder, types }: SearchBarProps) {
+  const [value, setValue] = useState("");
+  const [type, setType] = useState(types?.[0]?.value || "");
 
-  const handleSearch = () => {
-    if (onSearch && searchValue.trim()) {
-      onSearch(searchValue, searchType)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (value.trim()) {
+      onSearch(value.trim());
     }
-  }
+  };
 
   return (
-    <div className="flex w-full max-w-3xl gap-2">
+    <form
+      onSubmit={handleSubmit}
+      className={cn(
+        "group relative flex gap-2",
+        "animate-in fade-in-0 slide-in-from-top-4"
+      )}
+    >
       <div className="relative flex-1">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search className="h-4 w-4 text-muted-foreground" />
-        </div>
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors duration-200 group-focus-within:text-foreground" />
         <Input
-          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="pl-10 bg-card border-primary/20 focus:border-primary focus:ring-primary/20 glow-border"
+          className={cn(
+            "pl-9 pr-4 transition-all duration-200",
+            "focus-visible:ring-2",
+            "hover:border-border/80",
+            "placeholder:transition-colors placeholder:duration-200"
+          )}
+        />
+        <div
+          className={cn(
+            "absolute inset-0 -z-10 rounded-md opacity-0 shadow-[0_0_0_3px_rgba(24,182,150,0.15)]",
+            "transition-all duration-500",
+            "group-focus-within:opacity-100"
+          )}
         />
       </div>
 
-      <Select value={searchType} onValueChange={setSearchType}>
-        <SelectTrigger className="w-[140px] border-primary/20 focus:ring-primary/20">
-          <SelectValue placeholder="Type" />
-        </SelectTrigger>
-        <SelectContent>
-          {types.map((type) => (
-            <SelectItem key={type.value} value={type.value}>
-              {type.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Button onClick={handleSearch} className="glow">
-        <ArrowRight className="h-4 w-4" />
-      </Button>
-    </div>
-  )
+      {types && (
+        <Select value={type} onValueChange={setType}>
+          <SelectTrigger className="w-[140px] shrink-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {types.map((type) => (
+              <SelectItem
+                key={type.value}
+                value={type.value}
+                className="transition-colors duration-200"
+              >
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    </form>
+  );
 }

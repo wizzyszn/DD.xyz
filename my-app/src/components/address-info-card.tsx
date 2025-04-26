@@ -1,65 +1,66 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatDistanceToNow } from "date-fns"
+import { Wallet, Clock, ArrowUpDown, Bot } from "lucide-react";
+import { DataCard } from "./data-card";
+import { cn } from "@/lib/utils";
 
 interface AddressInfoProps {
-  addressInfo: {
-    balance: number
-    transaction_count: number
-    time_1st_tx: string
-    automated_trading: boolean
-    has_no_balance: boolean
-    has_no_transactions: boolean
-  }
-  isContract: boolean
+  data: {
+    address: string;
+    balance: number;
+    transactionCount: number;
+    firstTxTime: string;
+    automated?: boolean;
+  };
+  className?: string;
 }
 
-export function AddressInfoCard({ addressInfo, isContract }: AddressInfoProps) {
-  const firstTxDate = new Date(addressInfo.time_1st_tx)
-  const accountAge = formatDistanceToNow(firstTxDate, { addSuffix: true })
-
+export function AddressInfoCard({ data, className }: AddressInfoProps) {
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Address Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Address Type</p>
-            <p className="text-sm font-medium">{isContract ? "Contract" : "EOA (Wallet)"}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Balance</p>
-            <p className="text-sm font-medium">{addressInfo.balance.toFixed(6)} ETH</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Transaction Count</p>
-            <p className="text-sm font-medium">{addressInfo.transaction_count}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">First Transaction</p>
-            <p className="text-sm font-medium">{accountAge}</p>
+    <DataCard
+      title="Address Information"
+      icon={<Wallet className="text-blue-500" />}
+      className={className}
+    >
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Address</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-mono hover:text-primary transition-colors">
+              {data.address}
+            </span>
+            {data.automated && (
+              <Bot
+                className="h-4 w-4 text-muted-foreground animate-in fade-in zoom-in"
+               // title="Automated Account"
+              />
+            )}
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2 mt-2">
-          {addressInfo.automated_trading && (
-            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 border border-blue-500/30 rounded-full text-xs">
-              Automated Trading
-            </span>
-          )}
-          {addressInfo.has_no_balance && (
-            <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-full text-xs">
-              No Balance
-            </span>
-          )}
-          {addressInfo.has_no_transactions && (
-            <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-full text-xs">
-              No Transactions
-            </span>
-          )}
+        <div className="flex items-center justify-between group">
+          <span className="text-sm font-medium">Balance</span>
+          <span className="text-sm tabular-nums transition-colors group-hover:text-primary">
+            {data.balance.toFixed(2)} ETH
+          </span>
         </div>
-      </CardContent>
-    </Card>
-  )
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-sm">
+            <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Transactions</span>
+          </div>
+          <span className="text-sm tabular-nums text-muted-foreground">
+            {data.transactionCount.toLocaleString()}
+          </span>
+        </div>
+        <div className="h-[1px] bg-border" />
+        <div className="flex items-center justify-between text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-sm">
+            <Clock className="h-4 w-4" />
+            <span>First Transaction</span>
+          </div>
+          <time className="text-sm" dateTime={data.firstTxTime}>
+            {new Date(data.firstTxTime).toLocaleDateString()}
+          </time>
+        </div>
+      </div>
+    </DataCard>
+  );
 }

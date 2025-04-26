@@ -1,347 +1,306 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Globe, AlertTriangle, ShieldAlert, CheckCircle, ExternalLink, XCircle, Info } from "lucide-react"
-import { SearchBar } from "@/components/search-bar"
-import { DataCard } from "@/components/data-card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react";
+import {
+  Link2,
+  ShieldAlert,
+  Globe,
+  AlertTriangle,
+  FileWarning,
+  Users,
+  History,
+} from "lucide-react";
+import { SearchBar } from "@/components/search-bar";
+import { DataCard } from "@/components/data-card";
+import { RiskScore } from "@/components/risk-score";
+import { RiskBadge } from "@/components/risk-badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 
-// Define the API response type
-interface UrlRiskResponse {
-  riskLevel: "high" | "medium" | "low" | "unknown"
-  description: string
-  message: string
+interface UrlRiskResult {
+  url: string;
+  score: number;
+  riskLevel: "high" | "medium" | "low";
+  lastChecked: string;
+  categories: {
+    phishing: number;
+    malware: number;
+    scam: number;
+  };
 }
 
-export default function UrlRisks() {
-  const [url, setUrl] = useState<string>("")
-  const [riskData, setRiskData] = useState<UrlRiskResponse | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+export default function UrlRisk() {
+  const [results, setResults] = useState<UrlRiskResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Function to handle search
-  const handleSearch = (searchValue: string) => {
-    setUrl(searchValue)
-    fetchUrlRiskData(searchValue)
-  }
-
-  // Function to fetch URL risk data
-  const fetchUrlRiskData = async (urlToCheck: string) => {
-    if (!urlToCheck) return
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // In a real implementation, this would be an API call
-      // For now, we'll simulate the API response
-
-      // Simulate different risk levels based on URL patterns for demo purposes
-      let mockResponse: UrlRiskResponse
-
-      if (urlToCheck.includes("scam") || urlToCheck.includes("phish")) {
-        mockResponse = {
-          riskLevel: "high",
-          description: "This URL has been blacklisted as a known phishing site.",
-          message: "Wrong response? Please report: https://forms.gle/4ievDbQDqRgrHcRV9",
-        }
-      } else if (urlToCheck.includes("new") || urlToCheck.includes("unknown")) {
-        mockResponse = {
-          riskLevel: "medium",
-          description: "Webacy AI engine predicted this URL as a medium risk address.",
-          message: "Wrong response? Please report: https://forms.gle/4ievDbQDqRgrHcRV9",
-        }
-      } else if (urlToCheck.includes("safe") || urlToCheck.includes("official")) {
-        mockResponse = {
-          riskLevel: "low",
-          description: "This URL is known as a safe project address.",
-          message: "Wrong response? Please report: https://forms.gle/4ievDbQDqRgrHcRV9",
-        }
-      } else {
-        mockResponse = {
-          riskLevel: "unknown",
-          description: "Inconclusive. Not enough data to determine risk level.",
-          message: "Wrong response? Please report: https://forms.gle/4ievDbQDqRgrHcRV9",
-        }
-      }
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setRiskData(mockResponse)
-    } catch (err) {
-      setError("Failed to analyze URL. Please try again.")
-      console.error("Error analyzing URL:", err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Function to get icon and color based on risk level
-  const getRiskLevelInfo = (riskLevel: string) => {
-    switch (riskLevel) {
-      case "high":
-        return {
-          icon: <ShieldAlert className="h-16 w-16 text-red-500" />,
-          color: "text-red-500",
-          borderColor: "border-red-500",
-          bgColor: "bg-red-500/10",
-          borderBgColor: "border-red-500/30",
-          label: "HIGH RISK",
-        }
-      case "medium":
-        return {
-          icon: <AlertTriangle className="h-16 w-16 text-yellow-500" />,
-          color: "text-yellow-500",
-          borderColor: "border-yellow-500",
-          bgColor: "bg-yellow-500/10",
-          borderBgColor: "border-yellow-500/30",
-          label: "MEDIUM RISK",
-        }
-      case "low":
-        return {
-          icon: <CheckCircle className="h-16 w-16 text-green-500" />,
-          color: "text-green-500",
-          borderColor: "border-green-500",
-          bgColor: "bg-green-500/10",
-          borderBgColor: "border-green-500/30",
-          label: "LOW RISK",
-        }
-      default:
-        return {
-          icon: <Info className="h-16 w-16 text-blue-500" />,
-          color: "text-blue-500",
-          borderColor: "border-blue-500",
-          bgColor: "bg-blue-500/10",
-          borderBgColor: "border-blue-500/30",
-          label: "UNKNOWN",
-        }
-    }
-  }
-
-  // Extract the form URL from the message
-  const extractFormUrl = (message: string): string => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g
-    const matches = message.match(urlRegex)
-    return matches ? matches[0] : "#"
-  }
+  const handleSearch = (value: string) => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setResults({
+        url: value,
+        score: 7.8,
+        riskLevel: "high",
+        lastChecked: new Date().toISOString(),
+        categories: {
+          phishing: 85,
+          malware: 45,
+          scam: 65,
+        },
+      });
+      setLoading(false);
+    }, 1000);
+  };
 
   return (
-    <div className="min-h-screen grid-pattern">
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-primary">URL Risks</h1>
-          <p className="text-muted-foreground max-w-3xl">
-            This API predicts the maliciousness of a given URL and helps protect you from phishing attempts.
-          </p>
+    <div className="flex min-h-screen flex-col gap-6 p-6">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold tracking-tight">URL Risk Analysis</h1>
+        <p className="text-lg text-muted-foreground">
+          Analyze URLs and domains for potential security threats and malicious
+          activity
+        </p>
+      </div>
 
-          <div className="mt-6 flex justify-center md:justify-start">
-            <SearchBar
-              placeholder="Enter URL to analyze..."
-              types={[{ value: "url", label: "URL" }]}
-              onSearch={handleSearch}
-            />
+      <div className="w-full max-w-3xl">
+        <SearchBar
+          onSearch={handleSearch}
+          placeholder="Enter URL to analyze..."
+          types={[
+            { value: "url", label: "URL" },
+            { value: "domain", label: "Domain" },
+          ]}
+        />
+      </div>
+
+      {loading ? (
+        <div className="animate-pulse space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-[200px] rounded-xl bg-muted"></div>
+            ))}
           </div>
         </div>
-
-        {isLoading && (
-          <div className="mb-8">
-            <DataCard title="Analyzing URL..." description="Please wait while we check the URL">
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="flex flex-col items-center gap-4">
-                  <Skeleton className="h-32 w-32 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-              </div>
-            </DataCard>
-          </div>
-        )}
-
-        {error && !isLoading && (
-          <div className="mb-8">
-            <DataCard title="Error" icon={<XCircle className="h-5 w-5 text-red-500" />}>
-              <div className="flex flex-col items-center justify-center py-6">
-                <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
-                <p className="text-red-500">{error}</p>
-                <Button className="mt-4" onClick={() => fetchUrlRiskData(url)}>
-                  Try Again
-                </Button>
-              </div>
-            </DataCard>
-          </div>
-        )}
-
-        {riskData && !isLoading && !error && (
-          <div className="mb-8">
+      ) : results ? (
+        <div className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <DataCard
-              title="URL Risk Analysis"
-              description={url || "URL Analysis"}
-              icon={<Globe className="h-5 w-5" />}
+              title="Risk Overview"
+              icon={<ShieldAlert className="text-red-500" />}
               glowing
             >
-              {/* Risk Level Display */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="flex flex-col items-center justify-center">
-                  {(() => {
-                    const { icon, color, borderColor, label } = getRiskLevelInfo(riskData.riskLevel)
-                    return (
-                      <>
-                        <div
-                          className={`w-32 h-32 rounded-full border-4 ${borderColor} flex items-center justify-center`}
-                        >
-                          {icon}
-                        </div>
-                        <p className={`mt-4 text-lg font-bold ${color}`}>{label}</p>
-                        <p className="text-sm text-muted-foreground">Risk Assessment</p>
-                      </>
-                    )
-                  })()}
+              <div className="flex flex-col items-center gap-4">
+                <RiskScore score={results.score} size="lg" />
+                <RiskBadge level={results.riskLevel} />
+                <p className="text-sm text-center text-muted-foreground">
+                  High risk of malicious activity detected
+                </p>
+              </div>
+            </DataCard>
+
+            <DataCard
+              title="Risk Categories"
+              icon={<FileWarning className="text-orange-500" />}
+            >
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">Phishing Risk</span>
+                    <span className="text-red-500 font-bold">
+                      {results.categories.phishing}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={results.categories.phishing}
+                    className="h-2 bg-muted [&>div]:bg-red-500"
+                  />
                 </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">Malware Risk</span>
+                    <span className="text-yellow-500 font-bold">
+                      {results.categories.malware}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={results.categories.malware}
+                    className="h-2 bg-muted [&>div]:bg-yellow-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">Scam Risk</span>
+                    <span className="text-orange-500 font-bold">
+                      {results.categories.scam}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={results.categories.scam}
+                    className="h-2 bg-muted [&>div]:bg-orange-500"
+                  />
+                </div>
+              </div>
+            </DataCard>
 
-                <div className="col-span-2">
-                  <h3 className="text-lg font-medium mb-2">Risk Assessment</h3>
+            <DataCard
+              title="Domain Info"
+              icon={<Globe className="text-blue-500" />}
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Registered</span>
+                  <span className="text-sm text-muted-foreground">
+                    2 months ago
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">SSL Status</span>
+                  <span className="text-sm font-medium text-red-500">
+                    Invalid
+                  </span>
+                </div>
+                <div className="h-[1px] bg-border" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Last Scan</span>
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(results.lastChecked).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </DataCard>
+          </div>
 
-                  {/* Risk Description */}
-                  <div
-                    className={`${getRiskLevelInfo(riskData.riskLevel).bgColor} ${getRiskLevelInfo(riskData.riskLevel).borderBgColor} border rounded-lg p-4 mb-4`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className={`h-5 w-5 ${getRiskLevelInfo(riskData.riskLevel).color} mt-0.5`} />
-                      <div>
-                        <h4 className={`text-sm font-medium ${getRiskLevelInfo(riskData.riskLevel).color}`}>
-                          {riskData.riskLevel.charAt(0).toUpperCase() + riskData.riskLevel.slice(1)} Risk
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">{riskData.description}</p>
+          <div className="rounded-xl border bg-card">
+            <Tabs defaultValue="analysis" className="w-full">
+              <TabsList className="w-full border-b px-4 py-2">
+                <TabsTrigger value="analysis">Detailed Analysis</TabsTrigger>
+                <TabsTrigger value="threats">Active Threats</TabsTrigger>
+                <TabsTrigger value="related">Related URLs</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="analysis" className="p-4">
+                <div className="space-y-4">
+                  {[1, 2, 3].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-4 rounded-lg border p-4 transition-colors duration-200 hover:bg-muted/50"
+                    >
+                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium">
+                            Critical Security Risk
+                          </h4>
+                          <time className="text-xs text-muted-foreground">
+                            1 hour ago
+                          </time>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Domain associated with known phishing campaigns
+                        </p>
+                        <div className="mt-2 flex items-center gap-4">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <History className="h-3.5 w-3.5" />
+                            First seen 2 days ago
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Users className="h-3.5 w-3.5" />
+                            Multiple reports
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="threats" className="p-4">
+                <div className="space-y-6">
+                  <div className="rounded-lg border p-4">
+                    <h3 className="text-sm font-medium mb-4">
+                      Active Security Threats
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <span className="text-sm">Phishing Campaign</span>
+                        </div>
+                        <span className="text-xs text-red-500">Active</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                          <span className="text-sm">Suspicious Scripts</span>
+                        </div>
+                        <span className="text-xs text-yellow-500">
+                          Detected
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Recommendations based on risk level */}
-                  <div className="bg-card/50 p-4 rounded-lg border border-border/50">
-                    <h4 className="text-sm font-medium mb-2">Recommendations</h4>
-                    {riskData.riskLevel === "high" && (
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start gap-2">
-                          <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                          <span>Do not visit this website or enter any personal information</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                          <span>Do not connect your wallet or sign any transactions</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                          <span>Report this URL to your browser or security provider</span>
-                        </li>
-                      </ul>
-                    )}
-                    {riskData.riskLevel === "medium" && (
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start gap-2">
-                          <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                          <span>Proceed with caution and verify the URL from official sources</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                          <span>Do not share sensitive information unless you're certain of legitimacy</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                          <span>Consider using a secure browser extension for additional protection</span>
-                        </li>
-                      </ul>
-                    )}
-                    {riskData.riskLevel === "low" && (
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>This URL appears to be safe based on our analysis</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>Always maintain standard security practices when browsing</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>Report any suspicious behavior if encountered</span>
-                        </li>
-                      </ul>
-                    )}
-                    {riskData.riskLevel === "unknown" && (
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start gap-2">
-                          <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>We couldn't determine the risk level of this URL</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>Proceed with caution and verify from official sources</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>Consider running additional security checks</span>
-                        </li>
-                      </ul>
-                    )}
+                  <div className="rounded-lg border p-4">
+                    <h3 className="text-sm font-medium mb-4">
+                      Historical Incidents
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <History className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">Previous Attacks</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          3 incidents
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </TabsContent>
 
-              {/* Report False Positive/Negative */}
-              <div className="mt-6 flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  className="gap-2"
-                  onClick={() => window.open(extractFormUrl(riskData.message), "_blank")}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Report Incorrect Result</span>
-                </Button>
-                <Button className="gap-2" onClick={() => fetchUrlRiskData(url)}>
-                  <Globe className="h-4 w-4" />
-                  <span>Scan Another URL</span>
-                </Button>
-              </div>
-            </DataCard>
+              <TabsContent value="related" className="p-4">
+                <div className="space-y-4">
+                  {[1, 2].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-4 rounded-lg border p-4 transition-colors duration-200 hover:bg-muted/50"
+                    >
+                      <Link2 className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium">
+                            Similar Malicious Domain
+                          </h4>
+                          <RiskBadge level="high" size="sm" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Related domain with similar malicious patterns
+                        </p>
+                        <div className="mt-2 flex items-center gap-4">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Globe className="h-3.5 w-3.5" />
+                            example-{i + 1}.com
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-        )}
-
-        {!riskData && !isLoading && !error && (
-          <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border/50 p-6">
-            <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
-              <Globe className="h-16 w-16 text-primary mb-4" />
-              <h2 className="text-2xl font-bold mb-2">URL Risk Scanner</h2>
-              <p className="text-muted-foreground mb-6">
-                Enter any URL to check if it's potentially malicious or a phishing attempt. Our AI-powered scanner will
-                analyze the URL and provide a risk assessment.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-                <div className="bg-card/50 p-4 rounded-lg border border-border/50 text-center">
-                  <ShieldAlert className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium mb-1">Phishing Detection</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Identify malicious websites trying to steal your information
-                  </p>
-                </div>
-                <div className="bg-card/50 p-4 rounded-lg border border-border/50 text-center">
-                  <AlertTriangle className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium mb-1">Scam Prevention</h3>
-                  <p className="text-xs text-muted-foreground">Avoid cryptocurrency scams and fraudulent websites</p>
-                </div>
-                <div className="bg-card/50 p-4 rounded-lg border border-border/50 text-center">
-                  <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <h3 className="text-sm font-medium mb-1">Safe Browsing</h3>
-                  <p className="text-xs text-muted-foreground">Browse with confidence knowing which sites are safe</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-lg border bg-card/50 p-8 text-center">
+          <Link2 className="h-12 w-12 text-muted-foreground/50" />
+          <h3 className="mt-4 text-lg font-medium">No URL Selected</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter a URL or domain above to analyze its security risks and
+            threats
+          </p>
+        </div>
+      )}
     </div>
-  )
+  );
 }
