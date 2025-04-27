@@ -51,7 +51,8 @@ export function AddressInfoCard({
         <div className="flex items-center justify-between group">
           <span className="text-sm font-medium">Balance</span>
           <span className="text-sm tabular-nums transition-colors group-hover:text-primary">
-            {data.balance.toFixed(9)} {chain && chain.toLocaleUpperCase()}
+            {data.has_no_balance ? 0 : data.balance.toFixed(9)}{" "}
+            {!data.has_no_balance && chain.toLocaleUpperCase()}
           </span>
         </div>
         <div className="flex items-center justify-between">

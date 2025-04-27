@@ -1,5 +1,4 @@
 import { AlertOctagon, FileWarning, AlertTriangle, Shield } from "lucide-react";
-import { SearchBar } from "@/components/search-bar";
 import { DataCard } from "@/components/data-card";
 import { RiskScore } from "@/components/risk-score";
 import { RiskBadge } from "@/components/risk-badge";

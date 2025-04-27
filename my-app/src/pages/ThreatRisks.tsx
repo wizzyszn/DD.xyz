@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
 import {
-  AlertTriangle,
   ExternalLink,
   Shield,
   AlertOctagon,
-  History,
   Activity,
-  Users,
 } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
 import { DataCard } from "@/components/data-card";
 import { RiskScore } from "@/components/risk-score";
-import { RiskTag } from "@/components/risk-tag";
 import { AddressInfoCard } from "@/components/address-info-card";
 import { FundFlowCard } from "@/components/fund-flow-card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { RiskBadge } from "@/components/risk-badge";
 type SingleCategory = {
   key: string;
   name: string;
@@ -67,7 +63,7 @@ interface AddressInfo {
   transaction_count: number;
   has_no_transactions: boolean;
 }
-interface ThreatData {
+export interface ThreatData {
   count: number;
   medium: number;
   high: number;
@@ -111,6 +107,14 @@ export default function ThreatRisks() {
   const [error, setError] = useState<ResponseError | null>(null);
   const [activityCount, setActivityCount] = useState(0);
   const WEBACY_API_KEY = import.meta.env.VITE_WEBACY_API_KEY;
+  useEffect(() => {
+    if (!threatData) return;
+    threatData?.issues.forEach((issue) => {
+      let count = 0;
+      count += issue.tags.length;
+      setActivityCount(count);
+    });
+  }, [threatData?.issues]);
   const handleSearch = async (value: string, chain?: string) => {
     setLoading(true);
     setAddress(value);
@@ -158,15 +162,7 @@ export default function ThreatRisks() {
     }
   };
   console.log(threatData);
-  useEffect(() => {
-    if (!threatData) return;
-    threatData?.issues.forEach((issue) => {
-      let count = 0;
-      count += issue.tags.length;
-      setActivityCount(count);
-    });
-  }, [threatData?.issues]);
-
+ 
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6">
       <div className="space-y-1">
@@ -189,7 +185,6 @@ export default function ThreatRisks() {
           <div className="text-red-500 mt-2 text-xs ">{error.message}</div>
         )}
       </div>
-
       {loading ? (
         <div className="animate-pulse space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -208,16 +203,16 @@ export default function ThreatRisks() {
             >
               <div className="flex flex-col items-center gap-4">
                 <RiskScore score={threatData.overallRisk || 0} size="lg" />
-                {/*      <div className="flex flex-wrap gap-2 justify-center">
-                  {threatData.tags.map((tag: any, i: number) => (
-                    <RiskTag
-                      key={i}
-                      name={tag.name}
-                      severity={tag.severity}
-                      type={tag.type}
-                    />
-                  ))}
-                </div>*/}
+                <RiskBadge
+                  level={
+                    threatData.overallRisk <= 10
+                      ? "low"
+                      : threatData.overallRisk > 10 &&
+                        threatData.overallRisk <= 50
+                      ? "medium"
+                      : "high"
+                  }
+                />
               </div>
             </DataCard>
 
@@ -257,8 +252,7 @@ export default function ThreatRisks() {
               <div className="flex items-center justify-between border-b px-4 py-2">
                 <TabsList className="w-auto">
                   <TabsTrigger value="risk-factors">Risk Factors</TabsTrigger>
-                  <TabsTrigger value="fund-flows">Fund Flows</TabsTrigger>
-                  <TabsTrigger value="network">Network Analysis</TabsTrigger>
+                  <TabsTrigger value="fund-flows">Network Analysis</TabsTrigger>
                 </TabsList>
                 <Button variant="outline" size="sm" className="gap-1.5">
                   <ExternalLink className="h-4 w-4" />
@@ -268,93 +262,20 @@ export default function ThreatRisks() {
 
               <TabsContent value="risk-factors" className="p-4">
                 <div className="space-y-4">
-                  {[1, 2, 3].map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-4 rounded-lg border p-4 transition-colors duration-200 hover:bg-muted/50"
-                    >
-                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-                      <div className="space-y-1 flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium">
-                            High Risk Activity Detected
-                          </h4>
-                          <time className="text-xs text-muted-foreground">
-                            2 hours ago
-                          </time>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Multiple high-value transfers to known malicious
-                          addresses
-                        </p>
-                        <div className="mt-2 flex items-center gap-4">
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <History className="h-3.5 w-3.5" />
-                            Pattern detected
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Users className="h-3.5 w-3.5" />
-                            Multiple entities involved
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  {threatData.issues[0].tags.map((tag) => {
+                    return (
+                      <SeverityCard
+                        title={tag.name}
+                        desc={tag.description}
+                        severity={tag.severity}
+                      />
+                    );
+                  })}
                 </div>
               </TabsContent>
 
               <TabsContent value="fund-flows" className="p-4">
-                <FundFlowCard />
-              </TabsContent>
-
-              <TabsContent value="network" className="p-4">
-                <div className="space-y-6">
-                  <div className="rounded-lg border p-4">
-                    <h3 className="text-sm font-medium mb-4">
-                      Connected Entities
-                    </h3>
-                    <div className="space-y-4">
-                      {[1, 2].map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start justify-between gap-4 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
-                        >
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-medium">
-                              Related Address #{i + 1}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              High-risk interaction pattern
-                            </p>
-                          </div>
-                          <RiskTag severity={8} name="High Risk" size="sm" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg border p-4">
-                    <h3 className="text-sm font-medium mb-4">
-                      Network Statistics
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">Connected Addresses</span>
-                        </div>
-                        <span className="text-sm font-medium">15</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Activity className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">Interaction Frequency</span>
-                        </div>
-                        <span className="text-sm font-medium">High</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <FundFlowCard threatData={threatData} address={address}/>
               </TabsContent>
             </Tabs>
           </div>
@@ -371,3 +292,57 @@ export default function ThreatRisks() {
     </div>
   );
 }
+
+interface SeverityCardProps {
+  title: string;
+  desc: string;
+  severity: number;
+}
+const SeverityCard = ({ title, desc, severity }: SeverityCardProps) => {
+  const [color, setColor] = useState("");
+  const [width, setWidth] = useState(1);
+  useEffect(() => {
+    setWidth(Math.round(severity * 10));
+    if (severity > 5 && severity <= 10) {
+      setColor("red");
+    } else if (severity <= 5 && severity > 2) {
+      setColor("yellow");
+    } else if (severity <= 2) {
+      setColor("green");
+    }
+  }, []);
+  return (
+    <div
+      className="grid grid-cols-3 gap-4 rounded-lg border p-4 transition-colors duration-200 hover:bg-muted/50"
+      key={desc}
+    >
+      <div className=" flex flex-col gap-2 col-span-1">
+        <h3 className=" text-lg">{title}</h3>
+        <div className=" flex flex-col gap-1">
+          <span className=" text-xs text-muted-foreground">Severity</span>
+          <span
+            className=" border"
+            style={{
+              position: "relative",
+              background: "#FFFFFF33",
+              height: "5px",
+              width: "90px",
+              borderRadius: "20px",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                height: "100%",
+                width: `${width}%`,
+                background: color,
+                borderRadius: "20px",
+              }}
+            ></span>
+          </span>
+        </div>
+      </div>
+      <div className="col-start-2 col-end-4 text-sm">{desc}</div>
+    </div>
+  );
+};
