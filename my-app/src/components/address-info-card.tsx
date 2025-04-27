@@ -1,7 +1,14 @@
 import { Wallet, Clock, ArrowUpDown } from "lucide-react";
 import { DataCard } from "./data-card";
 import { formatAddress } from "@/lib/utils";
-
+import EthereumIcon from "./Icons/Ethereum";
+import SolanaLogo from "./Icons/Solana";
+import ArbitrumLogo from "./Icons/Arbitrum";
+import TonLogo from "./Icons/Ton";
+import SeiLogo from "./Icons/Sei";
+import PolygonIcon from "./Icons/Polygon";
+import BinanceLogo from "./Icons/Binance";
+import React from "react";
 interface AddressInfoProps {
   data: AddressInfo;
   className?: string;
@@ -35,6 +42,7 @@ export function AddressInfoCard({
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Address</span>
           <div className="flex items-center gap-2">
+            <SelectIcon chain={chain} />
             <span className="text-sm font-mono hover:text-primary transition-colors">
               {formatAddress(address)}
             </span>
@@ -61,7 +69,10 @@ export function AddressInfoCard({
             <Clock className="h-4 w-4" />
             <span>Age</span>
           </div>
-          <time className="text-sm" dateTime={new Date(data.time_verified).toDateString()}>
+          <time
+            className="text-sm"
+            dateTime={new Date(data.time_verified).toDateString()}
+          >
             {new Date(data.time_1st_tx).toLocaleDateString()}
           </time>
         </div>
@@ -69,3 +80,27 @@ export function AddressInfoCard({
     </DataCard>
   );
 }
+
+interface SelectIconProps {
+  chain: string;
+}
+export const SelectIcon: React.FC<SelectIconProps> = ({ chain }) => {
+  switch (chain) {
+    case "eth":
+      return <EthereumIcon size={24} />;
+    case "sol":
+      return <SolanaLogo size={24} />;
+    case "arb":
+      return <ArbitrumLogo size={24} />;
+    case "ton":
+      return <TonLogo size={24} />;
+    case "sei":
+      return <SeiLogo size={24} />;
+    case "poly":
+      return <PolygonIcon size={24} />;
+    case "bnb":
+      return <BinanceLogo size={24} />;
+    default:
+      return null;
+  }
+};

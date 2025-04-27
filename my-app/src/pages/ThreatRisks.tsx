@@ -110,7 +110,7 @@ export default function ThreatRisks() {
   const [chainType, setChainType] = useState("");
   const [error, setError] = useState<ResponseError | null>(null);
   const [activityCount, setActivityCount] = useState(0);
-
+  const WEBACY_API_KEY = import.meta.env.VITE_WEBACY_API_KEY;
   const handleSearch = async (value: string, chain?: string) => {
     setLoading(true);
     setAddress(value);
@@ -123,7 +123,7 @@ export default function ThreatRisks() {
           method: "GET",
           headers: {
             accept: "application/json",
-            "x-api-key": "xmKKmaD3Th5tP3PUPUZsB8MaiZ3RvhVe4EpTaTzJ",
+            "x-api-key": WEBACY_API_KEY,
           },
         }
       );
