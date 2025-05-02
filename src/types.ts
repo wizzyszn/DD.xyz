@@ -5,6 +5,11 @@ interface DedupeJson {
     overallRisk: number;
     issues: Issue[];
   }
+  interface ResponseError extends Error {
+    message: string;
+    error: string;
+    statusCode: number;
+  }
   
   interface Issue {
     transaction: Transaction;
@@ -164,4 +169,8 @@ interface DedupeJson {
       medium: string;
       low: string;
     };
+  }
+
+  export type {
+    ResponseError
   }

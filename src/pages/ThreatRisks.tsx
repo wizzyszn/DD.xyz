@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import {ResponseError} from "@/types"
 import {
   ExternalLink,
   Shield,
@@ -80,11 +81,7 @@ export interface ThreatData {
     address_info: AddressInfo;
   };
 }
-interface ResponseError extends Error {
-  message: string;
-  error: string;
-  statusCode: number;
-}
+
 const Chains = [
   { label: "ETH", value: "eth" },
   { label: "Base", value: "base" },
@@ -161,7 +158,6 @@ export default function ThreatRisks() {
       setLoading(false);
     }
   };
-  console.log(threatData);
  
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6">
